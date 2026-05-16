@@ -1,45 +1,35 @@
+//import java.util.*;
+
 class Solution {
-    public String minWindow(String s, String t) {
-        if(s.length()<t.length())return "";
+    public int[] maxSlidingWindow(int[] nums, int k) {
 
-        int[] freq=new int[128];
+        Deque<Integer> dq = new LinkedList<>();
+        int n = nums.length;
 
-        for(char ch:t.toCharArray()){
-            freq[ch]++;
-        }
-        int left=0;
-        int count=t.length();
+        int[] result = new int[n - k + 1];
+        int idx = 0;
 
-        int minLen=Integer.MAX_VALUE;
-        int start=0;
+        for (int i = 0; i < n; i++) {
 
-        for(int right=0;right<s.length();right++){
-            char r=s.charAt(right);
-
-            if(freq[r]>0){
-                count--;
+            // Remove indices outside current window
+            if (!dq.isEmpty() && dq.peekFirst() == i - k) {
+                dq.pollFirst();
             }
-            freq[r]--;
 
-            while(count==0){
+            // Remove smaller elements from back
+            while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i]) {
+                dq.pollLast();
+            }
 
-                if(right-left+1<minLen){
-                    minLen=right-left+1;
-                    start=left;
-                }
+            // Add current index
+            dq.offerLast(i);
 
-                char l=s.charAt(left);
-                freq[l]++;
-
-                if(freq[l]>0){
-                    count++;
-                }
-
-                left++;
-
-
+            // Store answer when first window is complete
+            if (i >= k - 1) {
+                result[idx++] = nums[dq.peekFirst()];
             }
         }
-        return minLen==Integer.MAX_VALUE?"":s.substring(start,start+minLen);
+
+        return result;
     }
 }
